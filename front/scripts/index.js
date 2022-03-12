@@ -1,8 +1,6 @@
-main();
 
-function main() {
-    allProducts();
-}
+allProducts();
+
 
 function allProducts () {
     fetch("http://localhost:3000/api/products")
@@ -18,33 +16,33 @@ function allProducts () {
             items.style.padding = "auto";
         })
         
-        .then(function(showApi) {
-            const products = showApi;
+        .then(function(products) {
             console.log(products);
             for(let product in products) {
-                let itemLink = document.createElement("a");
+                const itemLink = document.createElement("a");
                 document.querySelector("#items").appendChild(itemLink);
-                itemLink.href = `./product.html?id=${showApi[product]._id}`;
+                itemLink.href = `./product.html?id=${products[product]._id}`;
                 
-                let productArticle = document.createElement("article");
+                const productArticle = document.createElement("article");
                 itemLink.appendChild(productArticle);
 
-                let productImg = document.createElement("img");
+                const productImg = document.createElement("img");
                 productArticle.appendChild(productImg);
-                productImg.src = showApi[product].imageUrl;
-                productImg.setAttribute("alt", showApi[product].altTxt);
+                productImg.src = products[product].imageUrl;
+                productImg.setAttribute("alt", products[product].altTxt);
 
-                let productTitle = document.createElement("h3");
+                const productTitle = document.createElement("h3");
                 productArticle.appendChild(productTitle);
                 productTitle.classList.add("productName");
-                productTitle.src = showApi[product].name;
+                productTitle.src = products[product].name;
                 productTitle.innerText = productTitle.src;
 
-                let productDescription = document.createElement("p");
+                const productDescription = document.createElement("p");
                 productArticle.appendChild(productDescription);
                 productDescription.classList.add("productDescription");
-                productDescription.src = showApi[product].description;
+                productDescription.src = products[product].description;
                 productDescription.innerText = productDescription.src;
+
             }
-        })
+        });
 }
