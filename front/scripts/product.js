@@ -2,14 +2,50 @@ const productUrl = window.location.href;
 const url = new URL(productUrl);
 const id = url.searchParams.get("id");
 
+const addToCartBtn = document.getElementById("addToCart");
+const quantity = document.getElementById("quantity");
+const color = document.getElementById('colors');
 
-getProduct();
+
+
+/*let productsArray = JSON.parse(localStorage.getItem("products"));
+
+if (productsArray == null ) {
+    productsArray = [];
+}
+productsArray.push(productsDetails);
+localStorage.setItem("products", JSON.stringify(productsArray));
+
+console.log(productsArray);*/
+
+/*let productsArray = JSON.parse(localStorage.getItem("products"));
+
+if(productsArray) {
+    productsArray.push(productsDetails);
+    localStorage.setItem("products", JSON.stringify(productsArray));
+    
+
+
+} else {
+    productsArray = [];
+    productsArray.push(productsDetails);
+    localStorage.setItem("products", JSON.stringify(productsArray));
+}
+
+console.log(productsArray)*/
+
+main();
+
+function main() {
+    getProduct();
+    addToCart();
+}
 
 
 function getProduct () {
     fetch(`http://localhost:3000/api/products/${id}`)
         .then(function(res) {
-            if(res.ok) {
+            if (res.ok) {
                 return res.json();
             }
         })
@@ -42,7 +78,36 @@ function getProduct () {
                     colorOption.appendChild(colorChoice);
                     colorChoice.setAttribute("value",item.colors[i]);
                     colorChoice.innerText = item.colors[i];
-
                 }
         });
 }
+
+function addToCart() {
+    /*let productsArray = [];*/
+
+    addToCartBtn.onclick = () => {
+        let productsDetails = {
+            id: id, 
+            color: color.value, 
+            quantity: quantity.value,
+        };
+        
+        let productsArray = [];
+
+        if(localStorage.getItem("products") !== null) {
+            productsArray = JSON.parse(localStorage.getItem("products"));
+        }
+            productsArray.push(productsDetails);
+            localStorage.setItem("products", JSON.stringify(productsArray));
+
+
+        if(productsDetails.id === productsArray.id) {
+            productsArray.push(productsDetails.quantity++);
+        }
+        console.log(productsArray)
+
+        
+
+    };
+}
+

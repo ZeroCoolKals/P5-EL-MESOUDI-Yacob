@@ -42,7 +42,7 @@ function allProducts () {
                 productDescription.classList.add("productDescription");
                 productDescription.src = products[product].description;
                 productDescription.innerText = productDescription.src;
-
             }
         });
+
 }
