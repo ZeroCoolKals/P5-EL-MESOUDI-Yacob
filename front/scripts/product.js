@@ -2,7 +2,7 @@ const productUrl = window.location.href;
 const url = new URL(productUrl);
 const id = url.searchParams.get("id");
 
-const addToCartBtn = document.getElementById("addToCart");
+
 const quantity = document.getElementById("quantity");
 const color = document.getElementById('colors');
 
@@ -38,7 +38,6 @@ main();
 
 function main() {
     getProduct();
-    addToCart();
 }
 
 
@@ -78,36 +77,40 @@ function getProduct () {
                     colorOption.appendChild(colorChoice);
                     colorChoice.setAttribute("value",item.colors[i]);
                     colorChoice.innerText = item.colors[i];
-                }
+                } 
         });
 }
 
-function addToCart() {
-    /*let productsArray = [];*/
 
-    addToCartBtn.onclick = () => {
-        let productsDetails = {
+const addToCartBtn = document.getElementById("addToCart");
+addToCartBtn.onclick = addToCart;
+
+function addToCart() {
+        let productsDetails = { 
             id: id, 
             color: color.value, 
-            quantity: quantity.value,
-        };
+            quantity: quantity.value
+        }
+        
         
         let productsArray = [];
 
         if(localStorage.getItem("products") !== null) {
             productsArray = JSON.parse(localStorage.getItem("products"));
+            
         }
-            productsArray.push(productsDetails);
-            localStorage.setItem("products", JSON.stringify(productsArray));
 
+        const index = productsArray.findIndex(function (product) {
+            return (product.id === productsDetails.id && product.color === productsDetails.color)
+        })
 
-        if(productsDetails.id === productsArray.id) {
-            productsArray.push(productsDetails.quantity++);
+        if(index === -1) {
+            productsArray.push(productsDetails); 
+        } else {
+            productsArray[index] = productsDetails;
         }
-        console.log(productsArray)
-
         
-
-    };
+        localStorage.setItem("products", JSON.stringify(productsArray));
+        
 }
 
