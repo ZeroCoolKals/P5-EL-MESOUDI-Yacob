@@ -100,15 +100,27 @@ function addToCart() {
             
         }
 
-        const index = productsArray.findIndex(function (product) {
+        const sameIdAndColor = productsArray.findIndex(function (product) {
             return (product.id === productsDetails.id && product.color === productsDetails.color)
         })
 
-        if(index === -1) {
+        const ObjDescriptor = Object.getOwnPropertyDescriptors(productsDetails);
+        const NoColor = ObjDescriptor.color.value;
+        const NoQuantity = ObjDescriptor.quantity.value; 
+
+        if(sameIdAndColor === -1) {
             productsArray.push(productsDetails); 
-        } else {
-            productsArray[index] = productsDetails;
-        }
+        } 
+            else {
+                productsArray[sameIdAndColor].quantity = productsDetails.quantity;
+            }
+
+        if(NoColor == "") {
+            productsArray.pop();
+        } 
+            else if(NoQuantity <= 0) {
+                productsArray.pop();
+            }
         
         localStorage.setItem("products", JSON.stringify(productsArray));
         
