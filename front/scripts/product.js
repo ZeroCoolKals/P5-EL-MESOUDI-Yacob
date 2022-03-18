@@ -7,33 +7,6 @@ const quantity = document.getElementById("quantity");
 const color = document.getElementById('colors');
 
 
-
-/*let productsArray = JSON.parse(localStorage.getItem("products"));
-
-if (productsArray == null ) {
-    productsArray = [];
-}
-productsArray.push(productsDetails);
-localStorage.setItem("products", JSON.stringify(productsArray));
-
-console.log(productsArray);*/
-
-/*let productsArray = JSON.parse(localStorage.getItem("products"));
-
-if(productsArray) {
-    productsArray.push(productsDetails);
-    localStorage.setItem("products", JSON.stringify(productsArray));
-    
-
-
-} else {
-    productsArray = [];
-    productsArray.push(productsDetails);
-    localStorage.setItem("products", JSON.stringify(productsArray));
-}
-
-console.log(productsArray)*/
-
 main();
 
 function main() {
@@ -92,7 +65,6 @@ function addToCart() {
             quantity: quantity.value
         }
         
-        
         let productsArray = [];
 
         if(localStorage.getItem("products") !== null) {
@@ -104,10 +76,6 @@ function addToCart() {
             return (product.id === productsDetails.id && product.color === productsDetails.color)
         })
 
-        const ObjDescriptor = Object.getOwnPropertyDescriptors(productsDetails);
-        const NoColor = ObjDescriptor.color.value;
-        const NoQuantity = ObjDescriptor.quantity.value; 
-
         if(sameIdAndColor === -1) {
             productsArray.push(productsDetails); 
         } 
@@ -115,6 +83,10 @@ function addToCart() {
                 productsArray[sameIdAndColor].quantity = productsDetails.quantity;
             }
 
+        const ObjDescriptor = Object.getOwnPropertyDescriptors(productsDetails);
+        const NoColor = ObjDescriptor.color.value;
+        const NoQuantity = ObjDescriptor.quantity.value;
+        
         if(NoColor == "") {
             productsArray.pop();
         } 
