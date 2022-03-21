@@ -7,11 +7,11 @@ const quantity = document.getElementById("quantity");
 const color = document.getElementById('colors');
 
 
-main();
 
-function main() {
+
+
     getProduct();
-}
+
 
 
 function getProduct () {

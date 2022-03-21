@@ -1,12 +1,13 @@
 
 const getProductsInArray = JSON.parse(localStorage.getItem("products")); 
 
-console.log(getProductsInArray)
+
+console.log(getProductsInArray);
 
 
-productsInArray();
+ArrayDetails();
 
-function productsInArray() {
+function ArrayDetails() {
     fetch(`http://localhost:3000/api/products`)
         .then(function(res) {
             if (res.ok){
@@ -48,15 +49,21 @@ function productsInArray() {
                 contentDescription.appendChild(titlePrice);
                 titlePrice.classList.add("cart__item__content__titlePrice");
 
-                const productTitle = document.createElement("p");
+                const productTitle = document.createElement("h2");
                 titlePrice.appendChild(productTitle);
                 productTitle.innerText = products[i].name;
 
+                const productColor = document.createElement("p");
+                titlePrice.appendChild(productColor);
+                productColor.innerText = getProductsInArray[i].color;
+                
+                
+                
+
                 const productPrice = document.createElement("p");
                 titlePrice.appendChild(productPrice);
-                productPrice.innerText = products[i].price;
-                parseInt(products[i].price);
-                
+                const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(products[i].price);
+                productPrice.innerText = euroFormat;
                 
                 
 
