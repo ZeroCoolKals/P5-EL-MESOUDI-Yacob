@@ -57,13 +57,39 @@ function ArrayDetails() {
                 titlePrice.appendChild(productColor);
                 productColor.innerText = getProductsInArray[i].color;
                 
-                
-                
-
                 const productPrice = document.createElement("p");
                 titlePrice.appendChild(productPrice);
                 const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(products[i].price);
                 productPrice.innerText = euroFormat;
+
+                const settings = document.createElement("div");
+                productsArticle.appendChild(settings);
+                settings.classList.add("cart__item__content__settings");
+
+                const quantity = document.createElement("div");
+                settings.appendChild(quantity);
+                quantity.classList.add("cart__item__content__settings__quantity");
+
+                const quantityP = document.createElement("p");
+                const quantityValue = document.createElement("input");
+                quantity.appendChild(quantityP);
+                quantity.appendChild(quantityValue);
+                quantityValue.type = 'number';
+                quantityValue.className = 'itemQuantity';
+                quantityValue.name = 'itemQuantity';
+                quantityValue.min = '1';
+                quantityValue.max = '100';
+                quantityValue.value = getProductsInArray[i].quantity;
+
+                const deleteProduct = document.createElement("div");
+                const deleteProductP = document.createElement("p");
+                productsArticle.appendChild(deleteProduct);
+                deleteProduct.className = "cart__item__content__settings__delete";
+                deleteProduct.appendChild(deleteProductP);
+                deleteProductP.className = "deleteItem";
+                deleteProductP.innerHTML = "Supprrimer";
+
+
                 
                 
 
