@@ -1,10 +1,6 @@
 
 const getProductsInArray = JSON.parse(localStorage.getItem("products")); 
 
-
-console.log(getProductsInArray);
-
-
 ArrayDetails();
 
 function ArrayDetails() {
@@ -58,8 +54,9 @@ function ArrayDetails() {
                 productColor.innerText = getProductsInArray[i].color;
                 
                 const productPrice = document.createElement("p");
+                const getPrice = products[i].price;
                 titlePrice.appendChild(productPrice);
-                const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(products[i].price);
+                const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice);
                 productPrice.innerText = euroFormat;
 
                 const settings = document.createElement("div");
@@ -80,6 +77,10 @@ function ArrayDetails() {
                 quantityValue.min = '1';
                 quantityValue.max = '100';
                 quantityValue.value = getProductsInArray[i].quantity;
+                quantityValue.addEventListener('change', function () {
+                    const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*quantityValue.value)
+                    productPrice.innerText = euroFormat;
+                })
 
                 const deleteProduct = document.createElement("div");
                 const deleteProductP = document.createElement("p");
@@ -88,17 +89,6 @@ function ArrayDetails() {
                 deleteProduct.appendChild(deleteProductP);
                 deleteProductP.className = "deleteItem";
                 deleteProductP.innerHTML = "Supprrimer";
-
-
-                
-                
-
-
-
             }
-            
-
-
-
         })
 }
