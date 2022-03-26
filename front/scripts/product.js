@@ -79,20 +79,20 @@ function addToCart() {
         if(sameIdAndColor === -1) {
             productsArray.push(productsDetails); 
         } 
-            else {
-                productsArray[sameIdAndColor].quantity = productsDetails.quantity;
-            }
+        else {
+            productsArray[sameIdAndColor].quantity = productsDetails.quantity;
+        }
 
         const ObjDescriptor = Object.getOwnPropertyDescriptors(productsDetails);
-        const NoColor = ObjDescriptor.color.value;
-        const NoQuantity = ObjDescriptor.quantity.value;
+        const colorValue = ObjDescriptor.color.value;
+        const quantityValue = ObjDescriptor.quantity.value;
         
-        if(NoColor == "") {
+        if(colorValue == "") {
             productsArray.pop();
         } 
-            else if(NoQuantity <= 0) {
-                productsArray.pop();
-            }
+        else if(quantityValue <= 0) {
+            productsArray.pop();
+        }
         
         localStorage.setItem("products", JSON.stringify(productsArray));
         
