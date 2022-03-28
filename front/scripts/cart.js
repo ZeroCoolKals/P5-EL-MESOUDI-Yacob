@@ -29,23 +29,29 @@ function ArrayDetails() {
         })
 
         .then(function(products) {
-            for(let i = 0; i < getProductsInArray.length; i++) {
+            for(let i in products) {
                 const productsArticle = document.createElement("article");
                 const articleParent = document.querySelector("#cart__items");
                 articleParent.appendChild(productsArticle);
                 productsArticle.classList.add("cart__item");
                 productsArticle.setAttribute("data-id", getProductsInArray[i].id);
                 productsArticle.setAttribute("data-color", getProductsInArray[i].color);
-
                 const imgDiv = document.createElement("div");
                 productsArticle.appendChild(imgDiv);
                 imgDiv.classList.add("cart__item__img");
 
                 const img = document.createElement("img");
                 imgDiv.appendChild(img);
-                img.src = products[i].imageUrl;
-                img.setAttribute("alt", products[i].altTxt);
-
+                const idInArray = getProductsInArray.findIndex(function(item) {
+                    return item.id === getProductsInArray[i].id
+                })
+                if(idInArray === -1) {
+                    img.src = products[i].imageUrl;
+                    img.setAttribute("alt", products[i].altTxt);
+                } else {
+                    img.src = products[idInArray].imageUrl;
+                    img.setAttribute("alt", products[idInArray].altTxt);
+                }                
                 const content = document.createElement("div");
                 productsArticle.appendChild(content);
                 content.classList.add("cart__item__content");
@@ -60,7 +66,12 @@ function ArrayDetails() {
 
                 const productTitle = document.createElement("h2");
                 titlePrice.appendChild(productTitle);
-                productTitle.innerText = products[i].name;
+                if(idInArray === -1) {
+                    productTitle.innerText = products[i].name;
+                } else {
+                    productTitle.innerText = products[idInArray].name;
+                }
+                
 
                 const productColor = document.createElement("p");
                 titlePrice.appendChild(productColor);
@@ -70,7 +81,13 @@ function ArrayDetails() {
                 const getPrice = products[i].price;
                 titlePrice.appendChild(productPrice);
                 const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*(getProductsInArray[i].quantity));
-                productPrice.innerText = euroFormat;
+                const euroFormatIfIdInArray = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(products[idInArray].price*(getProductsInArray[i].quantity));
+                if(idInArray === -1) {
+                    productPrice.innerText = euroFormat;
+                } else {
+                    productPrice.innerText = euroFormatIfIdInArray;
+                }
+                
 
                 const settings = document.createElement("div");
                 productsArticle.appendChild(settings);
@@ -118,9 +135,8 @@ function ArrayDetails() {
 
                 const parent = document.getElementById("cart__items");
                 deleteProductP.addEventListener("click", event => {
-                    console.log(quantityDetails.closest(".cart__item"));
                     parent.removeChild(quantityDetails.closest(".cart__item"));
-                    getProductsInArray.splice([i], 1);
+                    getProductsInArray.splice(i, 1);
                     localStorage.setItem("products", JSON.stringify(getProductsInArray));
 
                 })
