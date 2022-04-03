@@ -1,57 +1,52 @@
 
 let getProductsInArray = JSON.parse(localStorage.getItem("products")); 
+let totalQuantityValue = 0;
+const totalQuantity = document.getElementById("totalQuantity");
 
-
-/*const parent = document.getElementById("cart__items");
-parent.removeChild(quantityDetails.closest(".cart__item"));
-console.log();*/
-
-
+const totalPrice = document.getElementById("totalPrice");
+let totalPriceValue = 0;
 
 
 
 
 ArrayDetails();
 
-function ArrayDetails() {
-    fetch(`http://localhost:3000/api/products`)
+
+
+async function ArrayDetails() {
+    const list = await fetch(`http://localhost:3000/api/products`)
         .then(function(res) {
             if (res.ok){
                 return res.json();
             }
         })
         
-        .catch((error) => {
-            const item = document.querySelector("#cart__items");
-            item.innerHTML = "Oups, l'API semble ne pas fonctionner !";
-            item.style.textAlign = "center";
-            item.style.padding = "auto";
+        .catch (() => {
+            const errorMessage = document.querySelector("#cart__items");
+            errorMessage.innerHTML = "Oups, l'API semble ne pas fonctionner !";
+            errorMessage.style.textAlign = "center";
+            errorMessage.style.padding = "auto";
         })
+        
+        getProductsInArray.forEach((productInCart, indexOfProductInCart) => {
+            const item = list.find(element => element._id === productInCart.id);
 
-        .then(function(products) {
-            for(let i in products) {
+            if(item) {
                 const productsArticle = document.createElement("article");
                 const articleParent = document.querySelector("#cart__items");
                 articleParent.appendChild(productsArticle);
                 productsArticle.classList.add("cart__item");
-                productsArticle.setAttribute("data-id", getProductsInArray[i].id);
-                productsArticle.setAttribute("data-color", getProductsInArray[i].color);
+                productsArticle.setAttribute("data-id", productInCart.id);
+                productsArticle.setAttribute("data-color", productInCart.color);
                 const imgDiv = document.createElement("div");
                 productsArticle.appendChild(imgDiv);
                 imgDiv.classList.add("cart__item__img");
 
                 const img = document.createElement("img");
                 imgDiv.appendChild(img);
-                const idInArray = getProductsInArray.findIndex(function(item) {
-                    return item.id === getProductsInArray[i].id
-                })
-                if(idInArray === -1) {
-                    img.src = products[i].imageUrl;
-                    img.setAttribute("alt", products[i].altTxt);
-                } else {
-                    img.src = products[idInArray].imageUrl;
-                    img.setAttribute("alt", products[idInArray].altTxt);
-                }                
+                img.src = item.imageUrl;
+                img.setAttribute("alt", item.altTxt);
+
                 const content = document.createElement("div");
                 productsArticle.appendChild(content);
                 content.classList.add("cart__item__content");
@@ -66,28 +61,17 @@ function ArrayDetails() {
 
                 const productTitle = document.createElement("h2");
                 titlePrice.appendChild(productTitle);
-                if(idInArray === -1) {
-                    productTitle.innerText = products[i].name;
-                } else {
-                    productTitle.innerText = products[idInArray].name;
-                }
-                
+                productTitle.innerText = item.name;
 
                 const productColor = document.createElement("p");
                 titlePrice.appendChild(productColor);
-                productColor.innerText = getProductsInArray[i].color;
+                productColor.innerText = productInCart.color;
                 
                 const productPrice = document.createElement("p");
-                const getPrice = products[i].price;
+                const getPrice = item.price;
                 titlePrice.appendChild(productPrice);
-                const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*(getProductsInArray[i].quantity));
-                const euroFormatIfIdInArray = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(products[idInArray].price*(getProductsInArray[i].quantity));
-                if(idInArray === -1) {
-                    productPrice.innerText = euroFormat;
-                } else {
-                    productPrice.innerText = euroFormatIfIdInArray;
-                }
-                
+                const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*(productInCart.quantity));
+                productPrice.innerText = euroFormat;
 
                 const settings = document.createElement("div");
                 productsArticle.appendChild(settings);
@@ -101,7 +85,6 @@ function ArrayDetails() {
                 const quantityDetails = document.createElement("input");
                 quantity.appendChild(quantityP);
                 quantity.appendChild(quantityDetails);
-
                 quantityP.innerHTML = "Qté :";
 
                 quantityDetails.type = 'number';
@@ -109,20 +92,24 @@ function ArrayDetails() {
                 quantityDetails.name = 'itemQuantity';
                 quantityDetails.min = '1';
                 quantityDetails.max = '100';
-                quantityDetails.setAttribute("value", getProductsInArray[i].quantity);
+                quantityDetails.setAttribute("value", productInCart.quantity);
+
+                totalQuantityValue = totalQuantityValue+parseInt(productInCart.quantity);
+                totalQuantity.innerHTML = totalQuantityValue;
+
+                
 
                 quantityDetails.addEventListener('change', function (e) {
                     const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*quantityDetails.value)
                     productPrice.innerText = euroFormat;
 
                     getProductsInArray.forEach(element => {
-                        if(element.id === getProductsInArray[i].id) {
+                        if(element.id === productInCart.id) {
                             element.quantity = e.target.value;
                         }
-                        
                     });
                     localStorage.setItem("products", JSON.stringify(getProductsInArray));
-                })
+                });
 
 
                 const deleteProduct = document.createElement("div");
@@ -134,17 +121,85 @@ function ArrayDetails() {
                 deleteProductP.innerHTML = "Supprimer";
 
                 const parent = document.getElementById("cart__items");
-                deleteProductP.addEventListener("click", event => {
+                deleteProductP.addEventListener("click", () => {
                     parent.removeChild(quantityDetails.closest(".cart__item"));
-                    getProductsInArray.splice(i, 1);
+                    getProductsInArray.splice(indexOfProductInCart, 1);
                     localStorage.setItem("products", JSON.stringify(getProductsInArray));
-
+                    
                 })
                 
             }
-        })
+        })               
 }
 
 
+const order = document.getElementById("order");
+const firstName = document.getElementById("firstName");
+const firstNameError = document.getElementById("firstNameErrorMsg");
+
+const lastName = document.getElementById("lastName");
+const lastNameError = document.getElementById("lastNameErrorMsg");
+
+const address = document.getElementById("address");
+const addressError = document.getElementById("addressErrorMsg");
+
+const city = document.getElementById("city");
+const cityError = document.getElementById("cityErrorMsg");
+
+const validateFirstAndLastNameAndCity = /^[a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï])?/;
+const validateAdress = /^[0-9]*[\s][a-zA-Z][a-zA-ZéèîÏÉÈÎÏ]+([-'\s][a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï])?/;
+const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+const email = document.getElementById("email");
+const emailError = document.getElementById("emailErrorMsg");
 
 
+function checkForm() {
+    order.addEventListener('click', (e) => {
+        if(validateFirstAndLastNameAndCity.test(firstName.value) == false) {
+            firstNameError.textContent = 'Format incorrect !';
+            firstNameError.style.color = '#ffff';
+            e.preventDefault();
+        }
+        else {
+            firstNameError.textContent = "";
+        }
+
+        if(validateFirstAndLastNameAndCity.test(lastName.value) == false) {
+            lastNameError.textContent = 'Format incorrect !';
+            lastNameError.style.color = '#ffff';
+            e.preventDefault();
+        }
+        else {
+            lastNameError.textContent ="";
+        }
+
+        if(validateAdress.test(address.value) == false) {
+            addressError.textContent = 'Format incorrect !';
+            addressError.style.color = '#ffff';
+            e.preventDefault();
+        }
+        else {
+            addressError.textContent = "";
+        }
+
+        if(validateFirstAndLastNameAndCity.test(city.value) == false) {
+            cityError.textContent = 'Format incorrect !';
+            cityError.style.color  ='#ffff';
+            e.preventDefault();
+        }
+        else {
+            cityError.textContent = "";
+        }
+
+        if(validateEmail.test(email.value) == false) {
+            emailError.textContent = "Format de l'email incorrect";
+            emailError.style.color = '#ffff';
+            e.preventDefault();
+        }
+        else {
+            email.textContent = "";
+        }
+    })
+}
+checkForm();
