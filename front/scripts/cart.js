@@ -146,7 +146,7 @@ const addressError = document.getElementById("addressErrorMsg");
 const city = document.getElementById("city");
 const cityError = document.getElementById("cityErrorMsg");
 
-const validateFirstAndLastNameAndCity = /^[a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï])?/;
+const validateFirstAndLastNameAndCity = /^\w+([-'\s]\w+)?/;
 const validateAdress = /^[0-9]*[\s][a-zA-Z][a-zA-ZéèîÏÉÈÎÏ]+([-'\s][a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï])?/;
 const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -156,49 +156,43 @@ const emailError = document.getElementById("emailErrorMsg");
 
 function checkForm() {
     order.addEventListener('click', (e) => {
-        if(validateFirstAndLastNameAndCity.test(firstName.value) == false) {
-            firstNameError.textContent = 'Format incorrect !';
-            firstNameError.style.color = '#ffff';
-            e.preventDefault();
+        if(
+            validateFirstAndLastNameAndCity.test(firstName.value) == false ||
+            validateFirstAndLastNameAndCity.test(lastName.value) == false ||
+            validateAdress.test(address.value) == false ||
+            validateFirstAndLastNameAndCity.test(city.value) == false ||
+            validateEmail.test(email.value) == false) {
+                e.preventDefault();
+                alert("Veuillez vérifier que vous n'avez laissé aucun champ vide, ou que les champs soient correctement écrits.")
         }
         else {
-            firstNameError.textContent = "";
-        }
+            e.preventDefault();
+            const contact = {
+                firstName:  firstName.value,
+                lastName: lastName.value,
+                address: address.value,
+                city: city.value,
+                email: email.value,
+            
+                products: getProductsInArray,
+            };
+            console.log(contact);
 
-        if(validateFirstAndLastNameAndCity.test(lastName.value) == false) {
-            lastNameError.textContent = 'Format incorrect !';
-            lastNameError.style.color = '#ffff';
-            e.preventDefault();
-        }
-        else {
-            lastNameError.textContent ="";
-        }
-
-        if(validateAdress.test(address.value) == false) {
-            addressError.textContent = 'Format incorrect !';
-            addressError.style.color = '#ffff';
-            e.preventDefault();
-        }
-        else {
-            addressError.textContent = "";
-        }
-
-        if(validateFirstAndLastNameAndCity.test(city.value) == false) {
-            cityError.textContent = 'Format incorrect !';
-            cityError.style.color  ='#ffff';
-            e.preventDefault();
-        }
-        else {
-            cityError.textContent = "";
-        }
-
-        if(validateEmail.test(email.value) == false) {
-            emailError.textContent = "Format de l'email incorrect";
-            emailError.style.color = '#ffff';
-            e.preventDefault();
-        }
-        else {
-            email.textContent = "";
+            function send() {
+                fetch('http://localhost:3000/api/products/order', {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(contact)
+                })
+            
+                .then((res) => res.json())
+                .then((data) => {
+                    localStorage.setItem("orderId", data.orderId);
+                    
+                    document.location.href = "../html/confirmation.html";
+                })
+            }
+            send();
         }
     })
 }
