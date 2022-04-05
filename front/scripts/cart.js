@@ -153,8 +153,9 @@ const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const email = document.getElementById("email");
 const emailError = document.getElementById("emailErrorMsg");
 
+checkFormAndPostRequest();
 
-function checkForm() {
+function checkFormAndPostRequest() {
     order.addEventListener('click', (e) => {
         if(
             validateFirstAndLastNameAndCity.test(firstName.value) == false ||
@@ -163,37 +164,46 @@ function checkForm() {
             validateFirstAndLastNameAndCity.test(city.value) == false ||
             validateEmail.test(email.value) == false) {
                 e.preventDefault();
-                alert("Veuillez vérifier que vous n'avez laissé aucun champ vide, ou que les champs soient correctement écrits.")
+                alert("Veuillez vérifier que vous n'avez laissé aucun champ vide, ou que les champs soient correctement remplis.")
         }
         else {
             e.preventDefault();
-            const contact = {
-                firstName:  firstName.value,
-                lastName: lastName.value,
-                address: address.value,
-                city: city.value,
-                email: email.value,
-            
+            const order = {
+                contact: {
+                    firstName:  firstName.value,
+                    lastName: lastName.value,
+                    address: address.value,
+                    city: city.value,
+                    email: email.value,
+                },
                 products: getProductsInArray,
             };
-            console.log(contact);
+            console.log(order);
 
-            function send() {
-                fetch('http://localhost:3000/api/products/order', {
+            send();
+            async function send() {
+                const postRequest = await fetch("http://localhost:3000/api/products/order", {
                     method: "POST",
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(contact)
+                    body: JSON.stringify(order),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
                 })
-            
+
                 .then((res) => res.json())
+
                 .then((data) => {
                     localStorage.setItem("orderId", data.orderId);
-                    
                     document.location.href = "../html/confirmation.html";
                 })
+
+                .catch(() => {
+                    alert("Une erreur est survenue.")
+                })
+
             }
-            send();
         }
-    })
+    });
 }
-checkForm();
+
