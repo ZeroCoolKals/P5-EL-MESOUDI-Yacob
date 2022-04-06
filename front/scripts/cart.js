@@ -153,9 +153,9 @@ const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const email = document.getElementById("email");
 const emailError = document.getElementById("emailErrorMsg");
 
-checkFormAndPostRequest();
+checkForm();
 
-function checkFormAndPostRequest() {
+function checkForm() {
     order.addEventListener('click', (e) => {
         if(
             validateFirstAndLastNameAndCity.test(firstName.value) == false ||
@@ -176,7 +176,7 @@ function checkFormAndPostRequest() {
                     city: city.value,
                     email: email.value,
                 },
-                products: getProductsInArray,
+                products: getProductsInArray.map(ele => ele.id),
             };
             console.log(order);
 
@@ -192,18 +192,15 @@ function checkFormAndPostRequest() {
                 })
 
                 .then((res) => res.json())
-
                 .then((data) => {
-                    localStorage.setItem("orderId", data.orderId);
-                    document.location.href = "../html/confirmation.html";
+                    window.location.href = `../html/confirmation.html?id=${data.orderId}`;
                 })
-
                 .catch(() => {
                     alert("Une erreur est survenue.")
-                })
-
+                });
             }
         }
     });
+
 }
 
