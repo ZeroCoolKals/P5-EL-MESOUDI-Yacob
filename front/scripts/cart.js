@@ -30,7 +30,6 @@ async function ArrayDetails() {
         
         getProductsInArray.forEach((productInCart, indexOfProductInCart) => {
             const item = list.find(element => element._id === productInCart.id);
-
             if(item) {
                 const productsArticle = document.createElement("article");
                 const articleParent = document.querySelector("#cart__items");
@@ -97,20 +96,19 @@ async function ArrayDetails() {
                 totalQuantityValue = totalQuantityValue+parseInt(productInCart.quantity);
                 totalQuantity.innerHTML = totalQuantityValue;
 
-                
-
-                quantityDetails.addEventListener('change', function (e) {
-                    const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*quantityDetails.value)
-                    productPrice.innerText = euroFormat;
-
-                    getProductsInArray.forEach(element => {
-                        if(element.id === productInCart.id) {
-                            element.quantity = e.target.value;
-                        }
+                modifyQuantityInLsAndPriceInDom();
+                function modifyQuantityInLsAndPriceInDom() {
+                    quantityDetails.addEventListener('change', function (e) {
+                        const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*quantityDetails.value)
+                        productPrice.innerText = euroFormat;
+                        getProductsInArray.forEach(element => {
+                            if(element.id === productInCart.id) {
+                                element.quantity = e.target.value;
+                            }
+                        });
+                        localStorage.setItem("products", JSON.stringify(getProductsInArray));
                     });
-                    localStorage.setItem("products", JSON.stringify(getProductsInArray));
-                });
-
+                };
 
                 const deleteProduct = document.createElement("div");
                 const deleteProductP = document.createElement("p");
@@ -120,48 +118,49 @@ async function ArrayDetails() {
                 deleteProductP.className = "deleteItem";
                 deleteProductP.innerHTML = "Supprimer";
 
-                const parent = document.getElementById("cart__items");
-                deleteProductP.addEventListener("click", () => {
-                    parent.removeChild(quantityDetails.closest(".cart__item"));
-                    getProductsInArray.splice(indexOfProductInCart, 1);
-                    localStorage.setItem("products", JSON.stringify(getProductsInArray));
-                    
-                })
-                
+                deleteFromDomAndLs();
+                function deleteFromDomAndLs() {
+                    const parent = document.getElementById("cart__items");
+                    deleteProductP.addEventListener("click", () => {
+                        parent.removeChild(quantityDetails.closest(".cart__item"));
+                        getProductsInArray.splice(indexOfProductInCart, 1);
+                        localStorage.setItem("products", JSON.stringify(getProductsInArray));
+                    })
+                }
+
             }
         })               
 }
 
 
+
+
+
+
+
+/** Cibler les diférents inputs du formulaire */
 const order = document.getElementById("order");
 const firstName = document.getElementById("firstName");
-const firstNameError = document.getElementById("firstNameErrorMsg");
-
 const lastName = document.getElementById("lastName");
-const lastNameError = document.getElementById("lastNameErrorMsg");
-
 const address = document.getElementById("address");
-const addressError = document.getElementById("addressErrorMsg");
-
 const city = document.getElementById("city");
-const cityError = document.getElementById("cityErrorMsg");
+const email = document.getElementById("email");
 
-const validateFirstAndLastNameAndCity = /^\w+([-'\s]\w+)?/;
-const validateAdress = /^[0-9]*[\s][a-zA-Z][a-zA-ZéèîÏÉÈÎÏ]+([-'\s][a-zA-ZéèîÏÉÈÎÏ][a-zéèêàçîï])?/;
+/** Regex des inputs */
+const validateFirstNameOrLastNameOrCity = /^\w+([-'\s]\w+)?/;
+const validateAdress = /^[0-9]*[\s]\w+([-'\s]\w)?/;
 const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-const email = document.getElementById("email");
-const emailError = document.getElementById("emailErrorMsg");
-
+/** Au clic sur le bouton "Commander !", paramétrage des actions efféctuées en fonction des conditions */
 checkForm();
 
 function checkForm() {
     order.addEventListener('click', (e) => {
         if(
-            validateFirstAndLastNameAndCity.test(firstName.value) == false ||
-            validateFirstAndLastNameAndCity.test(lastName.value) == false ||
+            validateFirstNameOrLastNameOrCity.test(firstName.value) == false ||
+            validateFirstNameOrLastNameOrCity.test(lastName.value) == false ||
             validateAdress.test(address.value) == false ||
-            validateFirstAndLastNameAndCity.test(city.value) == false ||
+            validateFirstNameOrLastNameOrCity.test(city.value) == false ||
             validateEmail.test(email.value) == false) {
                 e.preventDefault();
                 alert("Veuillez vérifier que vous n'avez laissé aucun champ vide, ou que les champs soient correctement remplis.")
@@ -182,7 +181,7 @@ function checkForm() {
 
             send();
             async function send() {
-                const postRequest = await fetch("http://localhost:3000/api/products/order", {
+                await fetch("http://localhost:3000/api/products/order", {
                     method: "POST",
                     body: JSON.stringify(order),
                     headers: {
