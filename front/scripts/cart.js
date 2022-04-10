@@ -150,6 +150,8 @@ function checkForm() {
     const city = document.getElementById("city");
     const email = document.getElementById("email");
 
+    //map d'erreur pour chaque input
+    //voir map en javascript (mdn ou autre ressource en ligne)
     const validError = {
         firstNameErrorMsg: "error 1",
         lastNameErrorMsg: "error 2",
@@ -168,20 +170,45 @@ function checkForm() {
     order.addEventListener('click', (e) => {
         e.preventDefault();
 
+        /* gerer les erreurs de façon dynamic en recuperant toutes 
+        les div avec la class 'cart__order__form__question' du document  */
         const form = document.getElementsByClassName("cart__order__form__question");
-        let contact = {}
+
+        //Iterer sur chaque element de form
         for (var i = 0; i < form.length; i++) {
-            const value = form[i].getElementsByTagName("input").item(0).value;
-            const cle = form[i].getElementsByTagName("p").item(0).attributes["id"].value;
-            const inpName = form[i].getElementsByTagName("input").item(0).attributes["name"].value;
-            if (!validateFirstNameOrLastNameOrCity.test(value)) {
-                const message = validError[cle];
-                console.log('cle:', message);
-                form[i].getElementsByTagName("p").item(0).textContent = message;
-                return;
-            } else {
-                contact[inpName] = value
-                form[i].getElementsByTagName("p").item(0).textContent = "";
+            //recuper l'element de type input dans le bloc
+            const formInput = form[i].getElementsByTagName("input").item(0);
+            const textSaisiDansInput = formInput.value;
+
+            //recuper l'element de type p dans le bloc
+            let formErrorMsgP = form[i].getElementsByTagName("p").item(0);
+
+            //Recuperer la valeur de l'attribut 'id'
+            const cle = formErrorMsgP.attributes["id"].value;
+
+            //Recuperer la valeur de l'attribut 'type' (exemple : text, email, number etc)
+            const inputType = formInput.attributes["type"].value;
+
+            // validation selon le type d'input
+            if (inputType == 'text') {
+                // test si la valeur saisi est vali => 
+                if (!validateFirstNameOrLastNameOrCity.test(textSaisiDansInput) /* meme chose si je mets : validateFirstNameOrLastNameOrCity.test(textSaisiDansInput) == false */) {
+                    //recuperer du message d'erreur sur note map (objet) clé-valeur 
+                    const message = validError[cle];
+                    //affichage du message
+                    formErrorMsgP.textContent = message;
+                    return;
+                } else {
+                    formErrorMsgP.textContent = "";
+                }
+            } else if (inputType == "email") {
+                if (!validateEmail.test(textSaisiDansInput)) {
+                    const message = validError[cle];
+                    formErrorMsgP.textContent = message;
+                    return;
+                } else {
+                    formErrorMsgP.textContent = "";
+                }
             }
 
         }
@@ -195,7 +222,6 @@ function checkForm() {
             },
             products: getProductsInArray.map(ele => ele.id),
         };
-        console.log(order);
 
         send(order);
 
@@ -216,7 +242,7 @@ function send(order) {
 
         .then((res) => res.json())
         .then((data) => {
-            window.location.href = `../html/confirmation.html?id=${data.orderId}`;
+            //window.location.href = `../html/confirmation.html?id=${data.orderId}`;
         })
         .catch(() => {
             alert("Une erreur est survenue.")
