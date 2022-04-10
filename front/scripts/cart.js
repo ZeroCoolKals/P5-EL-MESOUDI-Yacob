@@ -242,7 +242,7 @@ function send(order) {
 
         .then((res) => res.json())
         .then((data) => {
-            window.location.href = `../html/confirmation.html?id=${data.orderId}`;
+            //window.location.href = `../html/confirmation.html?id=${data.orderId}`;
         })
         .catch(() => {
             alert("Une erreur est survenue.")
