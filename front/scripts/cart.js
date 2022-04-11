@@ -14,19 +14,7 @@ ArrayDetails();
 
 
 async function ArrayDetails() {
-    const list = await fetch(`http://localhost:3000/api/products`)
-        .then(function (res) {
-            if (res.ok) {
-                return res.json();
-            }
-        })
-
-        .catch(() => {
-            const errorMessage = document.querySelector("#cart__items");
-            errorMessage.innerHTML = "Oups, l'API semble ne pas fonctionner !";
-            errorMessage.style.textAlign = "center";
-            errorMessage.style.padding = "auto";
-        })
+    const list = await getApiProduct();
 
     getProductsInArray.forEach((productInCart, indexOfProductInCart) => {
         const item = list.find(element => element._id === productInCart.id);
@@ -361,33 +349,22 @@ async function calculTotaux() {
     const totalPrice = document.getElementById("totalPrice");
 
     let getProductsInArray = getLocalStorage();
-    let apiData = await fetch(`http://localhost:3000/api/products`)
-        .then(function (res) {
-            if (res.ok) {
-                return res.json();
-            }
-        })
-        .catch(() => {
-            const errorMessage = document.querySelector("#cart__items");
-            errorMessage.innerHTML = "Oups, l'API semble ne pas fonctionner !";
-            errorMessage.style.textAlign = "center";
-            errorMessage.style.padding = "auto";
-        });
+    let apiData = await getApiProduct();
 
-    console.log('getProductsInArray:', getProductsInArray);
     if (getProductsInArray.length > 0) {
         getProductsInArray.forEach((localStorageProduct) => {
             const item = apiData.find(element => element._id == localStorageProduct.id);
             if (item) {
-                totalQuantityValue +=  parseInt(localStorageProduct.quantity);
+                totalQuantityValue += parseInt(localStorageProduct.quantity);
+                totalPriceValue += parseInt(item.price * localStorageProduct.quantity);
+
                 totalQuantity.innerText = totalQuantityValue;
-                //let totalPriceValue = 0;
+                totalPrice.innerText = totalPriceValue;
             }
-
         });
-        console.log('variable:', totalQuantityValue);
-
-
+    } else {
+        totalQuantity.innerText = 0;
+        totalPrice.innerText = 0;
     }
 }
 
@@ -395,20 +372,21 @@ function getLocalStorage() {
     return JSON.parse(localStorage.getItem("products"));
 }
 
-function getApiProduct() {
-    let resp = fetch(`http://localhost:3000/api/products`)
+async function getApiProduct() {
+    let data = [];
+    await fetch(`http://localhost:3000/api/products`)
         .then(function (res) {
             if (res.ok) {
-                return res.json();
+                data = res.json();
             }
         })
-
         .catch(() => {
             const errorMessage = document.querySelector("#cart__items");
             errorMessage.innerHTML = "Oups, l'API semble ne pas fonctionner !";
             errorMessage.style.textAlign = "center";
             errorMessage.style.padding = "auto";
-            return [];
         })
+
+    return data;
 
 }
